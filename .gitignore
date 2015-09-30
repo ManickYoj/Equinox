@@ -1,0 +1,13 @@
+.demeteorized
+db/
+.db/
+.meteor/local
+.reports
+.build
+.npm
+.DS_Store
+**/*.sw?
+ssl.pem
+bundle.tar.gz
+npm-debug.log
+.dump
