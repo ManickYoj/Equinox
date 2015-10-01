@@ -110,13 +110,16 @@ OrbitVisualizer = React.createClass({
     }
 
     let trailX, trailY, trailStyle;
-    const trailElements = ship.trails.filter((trailCoord, index, arr) => {
-      return (
-        showTrails &&
-        index % trailSparsity === 0 &&
-        index > arr.length - trailLength * trailSparsity
-      )
-    }).map((trailCoord, index, arr) => {
+    const trailOffset = ship.trails.offset;
+    const trailElements = ship.trails.points.filter(
+      (trailCoord, index, arr) => {
+        return (
+          showTrails &&
+          (index + trailOffset) % trailSparsity === 0 &&
+          index > arr.length - trailLength * trailSparsity
+        )
+      }
+    ).map((trailCoord, index, arr) => {
       [trailX, trailY] = trailCoord;
 
         trailStyle = {
