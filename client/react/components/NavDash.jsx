@@ -12,7 +12,7 @@ NavDash = React.createClass({
       // Server settings
       G: 6.674 * Math.pow(10, -11), // Server/both
       stepSize: 60,                 // Server/both
-      trailBuffer: 5000,            // How many recent positions to keep in memory
+      trailBuffer: 5000, // How many recent positions to keep in memory
     }
   },
 
@@ -36,7 +36,10 @@ NavDash = React.createClass({
           mass: 370131,
         },
 
-        trails: [],
+        trails: {
+          offset: 0,    // Offset for reading the array, useful, but weird
+          points: [],
+        }
       },
 
     };
@@ -95,8 +98,17 @@ NavDash = React.createClass({
     const { trailBuffer } = this.props;
     let { ship } = this.state;
 
-    ship.trails.push([x, y]);
-    if (ship.trails.length >= trailBuffer) ship.trails.shift();
+    ship.trails.points.push([x, y]);
+    if (ship.trails.points.length >= trailBuffer) {
+      ship.trails.points.shift();
+
+      // Increment the offset if the buffer length would be exceeded
+      ship.trails.offset ++;
+
+      // And wrap the buffer offset when it hits the buffer length
+      if (ship.trails.offset === ship.trails.points.length)
+        ship.trails.offset = 0;
+    }
   },
 
   render() {
