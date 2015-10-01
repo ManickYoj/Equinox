@@ -1,9 +1,96 @@
 const { PropTypes } = React;
 
 OrbitVisualizer = React.createClass({
+  propTypes: {
+    ship: PropTypes.object.isRequired,
+    planets: PropTypes.array.isRequired,
+    size: PropTypes.number,
+
+    // Setting variables
+    showTrails: PropTypes.bool,
+    followShip: PropTypes.bool,
+    scrollSensitivity: PropTypes.number,
+    trailLength: PropTypes.number,
+    trailSparsity: PropTypes.number,
+  },
+
+  getDefaultProps() {
+    return {
+      size: 800,
+      showTrails: true,
+      followShip: false,
+      scrollSensitivity: .002,
+      trailLength: 20,
+      trailSparsity: 5,
+    };
+  },
+
+  getInitialState() {
+    const { size, trailSparsity } = this.props;
+    const mapSize = 10000000;
+
+    return {
+      mapSize,
+      mapCenter: [0, 0],
+      scale: (size/2) / mapSize,
+    };
+  },
+
+  componentWillReceiveProps(nextProps) {
+    const { followShip } = this.props;
+
+    if (followShip) this.setState({
+      mapCenter: nextProps.ship.transform.pos
+    });
+  },
+
+  _handleScroll(event) {
+    const { scrollSensitivity, size } = this.props;
+    let { mapSize } = this.state;
+
+    mapSize += scrollSensitivity * mapSize * event.deltaY;
+    const scale = (size/2) / mapSize
+
+    event.preventDefault();
+    this.setState({ mapSize, scale });
+  },
+
   render () {
-    const { transform, size, scale, trails, bodyRadius } = this.props;
-    const [x, y, dx, dy, heading] = transform;
+    const {
+      ship, size, planets,
+      trailSparsity, trailLength, showTrails
+    } = this.props;
+    const { scale, mapCenter, mapSize } = this.state;
+
+    const [mx, my] = mapCenter;
+    const [x, y] = ship.transform.pos;
+
+    let planetStyle, px, py;
+    const planetElements = planets.map((planet, index) => {
+      [px, py] = planet.pos;
+
+      planetStyle = {
+        // Positioning correctly
+        position: "absolute",
+        width: planet.radius * 2 * scale + "px",
+        height: planet.radius * 2 * scale + "px",
+        left: size/2 + (px - mx) * scale + "px",
+        top: size/2 + (py - my) * scale + "px",
+        transform: "translate(-50%, -50%)",
+
+        // Styling
+        border: "1px solid white",
+        borderRadius: "50%",
+      }
+
+      return (
+        <div
+          key={"planet" + index}
+          className="planet"
+          style={planetStyle}>
+        </div>
+      )
+    });
 
     const style = {
       height: size + "px",
@@ -11,47 +98,47 @@ OrbitVisualizer = React.createClass({
       position: "relative",
     }
 
-    const planetStyle = {
-      position: "absolute",
-      top: size/2 + "px",
-      left: size/2 + "px",
-      width: bodyRadius * 2 * scale + "px",
-      height: bodyRadius * 2 * scale + "px",
-      transform: "translate(-50%, -50%)",
-      border: "1px solid white",
-      borderRadius: "50%",
-    }
-
     const shipBoxStyle = {
       position: "absolute",
-      top: size/2 + y * scale + "px",
-      left: size/2 + x * scale + "px",
+      top: size/2 + (y - my) * scale + "px",
+      left: size/2 + (x - mx) * scale + "px",
       transform: "translate(-50%, -50%)",
     }
 
     const shipStyle = {
-      transform: "rotate(" + heading + "rad)",
+      transform: "rotate(" + ship.transform.ang + "rad)",
     }
 
     let trailX, trailY, trailStyle;
-    const trailIcons = trails.map((trailCoords, index) => {
-      [trailX, trailY] = trailCoords;
-      trailStyle = {
-        position: "absolute",
-        top: size/2 + trailY * scale + "px",
-        left: size/2 + trailX * scale + "px",
-        transform: "translate(-50%, -50%)",
-      }
-      return <div key={index} style={trailStyle}>+</div>;
+    const trailElements = ship.trails.filter((trailCoord, index, arr) => {
+      return (
+        showTrails &&
+        index % trailSparsity === 0 &&
+        index > arr.length - trailLength * trailSparsity
+      )
+    }).map((trailCoord, index, arr) => {
+      [trailX, trailY] = trailCoord;
+
+        trailStyle = {
+          position: "absolute",
+          top: size/2 + (trailY - my)* scale + "px",
+          left: size/2 + (trailX - mx) * scale + "px",
+          transform: "translate(-50%, -50%)",
+          opacity: 1 - (arr.length - index) / trailLength,
+        }
+
+        return <div key={"trail" + index} style={trailStyle}>+</div>;
     });
 
     return (
-      <div id="OrbitVisualizer" style={style}>
-        <div className="planet" style={planetStyle}></div>
+      <div id="OrbitVisualizer" style={style} onWheel={this._handleScroll}>
+        {planetElements}
+
         <div className="shipBox" style={shipBoxStyle}>
           <div className="ship" style={shipStyle}>↑</div>
         </div>
-        {trailIcons}
+
+        {trailElements}
       </div>
     );
   }
