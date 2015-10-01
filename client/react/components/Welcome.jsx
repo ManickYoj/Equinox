@@ -39,9 +39,9 @@ Welcome = React.createClass ({
             `  `,
             `- Sector: ${sector.name}`,
             `- Ship Orbital Characteristics:`,
-            `| Radius: ${ship.pos.radius} light-seconds`,
-            `| Theta: ${ship.pos.theta} degrees`,
-            `| Phi: ${ship.pos.phi} degrees`
+            `| Radius: ${ship.transform.radius} light-seconds`,
+            `| Theta: ${ship.transform.theta} degrees`,
+            `| Phi: ${ship.transform.phi} degrees`
           ]}
         />
 

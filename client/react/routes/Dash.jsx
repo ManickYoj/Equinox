@@ -11,11 +11,12 @@ Dash = React.createClass({
     return {
       ship: {
         name: "USS Equinox",
-        pos: {
+        transform: {
           radius: 1.20,
           theta: 86.45,
-          phi: 169.08,
-        }
+          phi: 23.08,
+          heading: 50,
+        },
       },
 
       sector: {
@@ -59,7 +60,7 @@ Dash = React.createClass({
         />
       ),
 
-      "nav": <NavDash />,
+      "nav": <NavDash ship={ship}/>,
     }
 
     this.setState({activeDisplay: displayMap[displayKey]});
