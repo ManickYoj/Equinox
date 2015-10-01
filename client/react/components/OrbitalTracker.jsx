@@ -1,29 +1,44 @@
 OrbitalTracker = React.createClass({
   getDefaultProps() {
     return {
-      M: 5.972 * Math.pow(10, 24),
-      G: 6.674 * Math.pow(10, -11),
-      R: 6371000,
-      stepSize: 10,
-      trailLength: 50,
-      trailSparsity: 10,
+      planets: [
+        {
+          // FIXME: planet disappears when I change, but orbit continues
+          pos: [0, 0],
+          mass: 5.972 * Math.pow(10, 24),
+          radius: 6371000,
+        },
+      ],
+
+      // Server settings
+      G: 6.674 * Math.pow(10, -11), // Server/both
+      stepSize: 60,                 // Server/both
+      trailBuffer: 5000,            // How many recent positions to keep in memory
     }
   },
 
   getInitialState() {
-    const { R, trailSparsity } = this.props;
+    const { trailSparsity } = this.props;
 
     return {
-      x: R + 418000,
-      y: 0,
-      dx: 0,
-      dy: 7667,
-      m: 370131,
-      theta: 0,
-      radius: 0,
-      trails: [],
-      trailCounter: trailSparsity,
-      mapSize: 10000000,
+      // Will move to props
+      ship: {
+
+        // All information about ship's location, direction, etc.
+        transform: {
+          pos: [6371000 + 418000, 0],    // Position
+          dPos: [0, 8667],               // Velocity
+          ang: 0,                        // Angular displacement
+          dAng: 0,                       // Angular speed
+        },
+
+        stats: {
+          mass: 370131,
+        },
+
+        trails: [],
+      },
+
     };
   },
 
@@ -36,68 +51,64 @@ OrbitalTracker = React.createClass({
   },
 
   _updateTransform() {
-    const { M, G, stepSize } = this.props;
-    let {x, y, dx, dy, m} = this.state;
+    const { planets, G, stepSize } = this.props;
+    const { ship } = this.state;
+
+    let [x, y] = ship.transform.pos;
+    let [dx, dy] = ship.transform.dPos;
+
     x += dx * stepSize;
     y += dy * stepSize;
 
     this._updateTrails(x, y);
 
-    const radius = this._radius(x, y);
-    const a = ( G * M ) / Math.pow(radius, 2);
-    const theta = Math.atan2(y, x);
+    const radius = this._radius(...ship.transform.pos);
 
-    dx -= a * stepSize *Math.cos(theta);
-    dy -= a * stepSize * Math.sin(theta);
+    let a, theta, px, py;
+    const A = [0, 0];
+    planets.forEach((planet) => {
+      // Calculate acceleration value and direction
+      [px, py] = planet.pos;
+      a = ( G * planet.mass ) / Math.pow(radius, 2);
+      theta = Math.atan2(py - y, px - x); // This could cause problems
 
-    // Honestly, don't quite understand this one - haven't done it out
-    // but it seems to work
-    const heading = Math.atan2(dy, dx) + Math.PI/2;
+      // Update acceleration vector
+      A[0] += a * stepSize * Math.cos(theta);
+      A[1] += a * stepSize * Math.sin(theta);
+    });
 
-    this.setState({x, y, dx, dy, theta, heading, radius});
+    dx += A[0];
+    dy += A[1];
 
-    setTimeout(this._updateTransform, 10);
+    ship.transform.pos = [x, y];
+    ship.transform.dPos = [dx, dy];
+    this.forceUpdate();
+
+    setTimeout(this._updateTransform, 50);
   },
 
   _updateTrails(x, y) {
-    const { trailSparsity, trailLength } = this.props;
-    let { trails, trailCounter } = this.state;
+    const { trailBuffer } = this.props;
+    let { ship } = this.state;
 
-    if (trailCounter == trailSparsity) {
-      trails.push([x, y]);
-      trailCounter = 0;
-      if (trails.length >= trailLength) trails.shift();
-    } else trailCounter++;
-
-    this.setState({trailCounter});
-  },
-
-  _handleScroll(event) {
-    let { mapSize } = this.state;
-
-    const factor = event.deltaY;
-    mapSize += .002 * mapSize * factor;
-    event.preventDefault();
-
-    this.setState({mapSize});
+    ship.trails.push([x, y]);
+    if (ship.trails.length >= trailBuffer) ship.trails.shift();
   },
 
   render() {
-    const { R } = this.props;
-    const { x, y, dx, dy, theta, heading, radius, trails, mapSize } = this.state;
+    const { planets } = this.props;
+    const { ship, theta, trails, mapSize } = this.state;
 
-    const size = 800;
-    const scale = (size/2) / mapSize;
+    const [x, y] = ship.transform.pos;
+    const [dx, dy] = ship.transform.dPos;
 
     return (
-      <div id="OrbitalTracker" onWheel={this._handleScroll}>
+      <div id="OrbitalTracker">
         <OrbitVisualizer
-          transform={[x, y, dx, dy, heading]}
-          size={size}
-          scale={scale}
-          showTrails={true}
+          ship={ship}
+          planets={planets}
+          mapSize={mapSize}
           trails={trails}
-          bodyRadius={R}
         />
 
         <div className="coordinates">
@@ -105,10 +116,6 @@ OrbitalTracker = React.createClass({
           <CoordDisplay label={"y"} unit={"m"} value={y} />
           <CoordDisplay label={"dx"} unit={"m/s"} value={dx} />
           <CoordDisplay label={"dy"} unit={"m/s"} value={dy} />
-          <CoordDisplay label={"radius"} unit={"m"} value={radius} />
-          <CoordDisplay label={"altitude"} unit={"m"} value={radius - R} />
-          <CoordDisplay label={"theta"} unit={"rad"} value={theta} />
-          <CoordDisplay label={"map size"} unit={"m"} value={mapSize} />
         </div>
       </div>
     );
