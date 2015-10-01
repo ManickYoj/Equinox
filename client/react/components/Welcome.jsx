@@ -3,23 +3,16 @@ const { PropTypes } = React;
 Welcome = React.createClass ({
   propTypes: {
     _onClick: PropTypes.func.isRequired,
+    ship: PropTypes.object.isRequired,
+    officer: PropTypes.object.isRequired,
+    sector: PropTypes.object.isRequired,
+    clickPrompt: PropTypes.string,
   },
   
   getDefaultProps() {
     return {
-      ship: {
-        pos: {
-          x: 17,
-          y: 192
-        }
-      },
-      
-      sector: "Korprulu",
-      
-      officer: {
-        type: "Navigation",
-      }
-    }
+      clickPrompt: "Click to Assume Control",
+    };
   },
   
   getInitialState() {
@@ -27,28 +20,34 @@ Welcome = React.createClass ({
   },
   
   render() {
-    const { officer, sector, ship, _onClick } = this.props;
+    const { officer, sector, ship, clickPrompt, _onClick } = this.props;
     const { showContinue } = this.state;
     
-    const continueButton = (
-      <div className="pulsating">[Click to Assume Control]</div>
+    let continueButton;
+    if (showContinue) continueButton = (
+      <div className="pulsating">[{clickPrompt}]</div>
     );
-    
-    // TODO: Animate text
+
     return (
       <div className="welcome" onClick={_onClick}>
         <Typed
           _onCompletion={ () => {this.setState({showContinue: true}); } }
           messages={[
-            `Welcome, ${officer.type} Officer.`,
-            `- Sector: ${sector}`,
-            `- Position: ${ship.pos.x}, ${ship.pos.y}`
+            `${ship.name} Log`,
+            `${officer.displayName} ${officer.appellation}
+             Entry ${officer.entry.padZeros()}`,
+            `  `,
+            `- Sector: ${sector.name}`,
+            `- Ship Orbital Characteristics:`,
+            `| Radius: ${ship.transform.radius} light-seconds`,
+            `| Theta: ${ship.transform.theta} degrees`,
+            `| Phi: ${ship.transform.phi} degrees`
           ]}
         />
 
         <div className="spacer"></div>
         
-        {showContinue ? continueButton : undefined}
+        {continueButton}
         
       </div>
     );
