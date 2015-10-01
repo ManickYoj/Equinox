@@ -1,9 +1,8 @@
-OrbitalTracker = React.createClass({
+NavDash = React.createClass({
   getDefaultProps() {
     return {
       planets: [
         {
-          // FIXME: planet disappears when I change, but orbit continues
           pos: [0, 0],
           mass: 5.972 * Math.pow(10, 24),
           radius: 6371000,
@@ -23,6 +22,7 @@ OrbitalTracker = React.createClass({
     return {
       // Will move to props
       ship: {
+        name: "USS Phoenix",
 
         // All information about ship's location, direction, etc.
         transform: {
@@ -42,14 +42,17 @@ OrbitalTracker = React.createClass({
     };
   },
 
+  // TODO: Move physics out
   componentDidMount() {
     this._updateTransform();
   },
 
+  // TODO: Move physics out
   _radius(x, y) {
     return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
   },
 
+  // TODO: Move physics out
   _updateTransform() {
     const { planets, G, stepSize } = this.props;
     const { ship } = this.state;
@@ -87,6 +90,7 @@ OrbitalTracker = React.createClass({
     setTimeout(this._updateTransform, 50);
   },
 
+  // TODO: Move physics out
   _updateTrails(x, y) {
     const { trailBuffer } = this.props;
     let { ship } = this.state;
@@ -103,7 +107,7 @@ OrbitalTracker = React.createClass({
     const [dx, dy] = ship.transform.dPos;
 
     return (
-      <div id="OrbitalTracker">
+      <div id="NavDash">
         <OrbitVisualizer
           ship={ship}
           planets={planets}
