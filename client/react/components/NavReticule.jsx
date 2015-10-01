@@ -32,10 +32,10 @@ NavReticule = React.createClass({
     const ticks = this._generateTicks(
       12, reticuleRadius, reticuleBound, reticuleBound
     );
-    const reticuleStyle = undefined;
-//    const reticuleStyle = {
-//      transform: "rotateX(40deg) rotateY(30deg)",
-//    }
+//    const reticuleStyle = undefined;
+    const reticuleStyle = {
+      transform: "rotateX(40deg) rotateY(30deg)",
+    }
 
     const shipStyle = {
       transform: "rotate(" + ship.transform.heading +  "deg) translate(-50%, -50%)",

@@ -7,10 +7,11 @@ NavDash = React.createClass({
 
   render (){
     const { ship } = this.props;
-
+//<NavReticule ship={ship}/>
     return (
       <div id="NavDash">
-        <NavReticule ship={ship}/>
+        <OrbitalTracker />
+
       </div>
     );
   }
