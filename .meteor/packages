@@ -14,3 +14,6 @@ cosmos:browserify
 
 npm-container
 less
+aldeed:simple-schema
+aldeed:collection2
+accounts-password
