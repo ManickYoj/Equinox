@@ -70,7 +70,7 @@ Dash = React.createClass({
     const { activeDisplay } = this.state;
     
 		return (
-			<div className="hud">
+			<div id="Dash">
         {activeDisplay}
       </div>
 		)
