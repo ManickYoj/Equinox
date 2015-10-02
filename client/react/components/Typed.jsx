@@ -70,7 +70,7 @@ Typed = React.createClass({
     const { renderedMessages } = this.state;
     
     const messages = renderedMessages.map((elt, ind) => {
-      return <div key={ind} className="force-height">{elt}</div>;
+      return <div key={ind} className="spacer">{elt}</div>;
     });
   
     return (
