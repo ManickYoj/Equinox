@@ -1,0 +1,32 @@
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+
+  background-color: black;
+  color: white;
+  font-family: monospace;
+}
+
+input[type="text"], input[type="password"], button {
+  border: none;
+  box-shadow: none;
+  appearance: none;
+  background: none;
+
+  color: white;
+  font-family: monospace;
+  text-align: center;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.input-group {
+  animation: pulsate 1.5s ease-in-out alternate infinite;
+
+  &:focus {
+    animation: none;
+  }
+}

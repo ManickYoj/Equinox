@@ -4,7 +4,7 @@ const { RouteHandler } = ReactRouter;
 App = React.createClass({
 	render() {
 		return (
-			<div id="App">
+			<div id="App" className="full-page">
         <RouteHandler />
       </div>
 		)

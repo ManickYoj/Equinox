@@ -119,7 +119,7 @@ NavDash = React.createClass({
     const [dx, dy] = ship.transform.dPos;
 
     return (
-      <div id="NavDash">
+      <div id="NavDash" className="full-page center-content">
         <OrbitVisualizer
           ship={ship}
           planets={planets}

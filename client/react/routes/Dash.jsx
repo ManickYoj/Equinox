@@ -1,7 +1,5 @@
 const { PropTypes } = React;
 
-
-
 Dash = React.createClass({
   propTypes: {
 
@@ -70,7 +68,7 @@ Dash = React.createClass({
     const { activeDisplay } = this.state;
     
 		return (
-			<div id="Dash">
+			<div id="Dash" className="full-page">
         {activeDisplay}
       </div>
 		)

@@ -70,13 +70,13 @@ Typed = React.createClass({
     const { renderedMessages } = this.state;
     
     const messages = renderedMessages.map((elt, ind) => {
-      return <div key={ind} className="spacer">{elt}</div>;
+      return <span key={ind}>{elt}</span>;
     });
   
     return (
-      <div>
+      <span>
         {messages}
-      </div>
+      </span>
     );
   }
 });
