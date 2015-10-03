@@ -67,7 +67,7 @@ OrbitVisualizer = React.createClass({
 
     let planetStyle, px, py;
     const planetElements = planets.map((planet, index) => {
-      [px, py] = planet.pos;
+      [px, py] = planet.transform.pos;
 
       planetStyle = {
         // Positioning correctly

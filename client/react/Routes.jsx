@@ -7,8 +7,8 @@ const {
 
 const routes = (
   <Route name="root" handler={App} path="/">
-    <DefaultRoute handler={Login} />
-    <Route path="dash" handler={Dash} />
+    <DefaultRoute handler={Dash} />
+    <Route path="login" handler={Login} />
     <NotFoundRoute handler={NotFound} />
   </Route>
 );

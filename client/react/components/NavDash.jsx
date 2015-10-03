@@ -3,15 +3,17 @@ NavDash = React.createClass({
     return {
       planets: [
         {
-          pos: [0, 0],
-          mass: 5.972 * Math.pow(10, 24),
+          transform: {
+            pos: [0, 0],    // Position
+            dPos: [0, 0],   // Velocity
+            ang: [0],       // Angular displacement
+            dAng: [0],      // Angular speed
+            mass: 5.972 * Math.pow(10, 24),
+          },
           radius: 6371000,
         },
       ],
 
-      // Server settings
-      G: 6.674 * Math.pow(10, -11), // Server/both
-      stepSize: 60,                 // Server/both
       trailBuffer: 5000, // How many recent positions to keep in memory
     }
   },
@@ -28,11 +30,8 @@ NavDash = React.createClass({
         transform: {
           pos: [6371000 + 418000, 0],    // Position
           dPos: [0, 8667],               // Velocity
-          ang: 0,                        // Angular displacement
-          dAng: 0,                       // Angular speed
-        },
-
-        stats: {
+          ang: [0],                        // Angular displacement
+          dAng: [0],                       // Angular speed
           mass: 370131,
         },
 
@@ -51,49 +50,22 @@ NavDash = React.createClass({
   },
 
   // TODO: Move physics out
-  _radius(x, y) {
-    return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-  },
-
-  // TODO: Move physics out
   _updateTransform() {
-    const { planets, G, stepSize } = this.props;
+    const { planets } = this.props;
     const { ship } = this.state;
 
-    let [x, y] = ship.transform.pos;
-    let [dx, dy] = ship.transform.dPos;
+    Physics.applyGravity(ship.transform, planets[0].transform);
+    Physics.updatePosition(ship.transform);
+    Physics.updatePosition(planets[0].transform);
 
-    x += dx * stepSize;
-    y += dy * stepSize;
+    this._updateTrails(...ship.transform.pos);
 
-    this._updateTrails(x, y);
-
-    const radius = this._radius(...ship.transform.pos);
-
-    let a, theta, px, py;
-    const A = [0, 0];
-    planets.forEach((planet) => {
-      // Calculate acceleration value and direction
-      [px, py] = planet.pos;
-      a = ( G * planet.mass ) / Math.pow(radius, 2);
-      theta = Math.atan2(py - y, px - x); // This could cause problems
-
-      // Update acceleration vector
-      A[0] += a * stepSize * Math.cos(theta);
-      A[1] += a * stepSize * Math.sin(theta);
-    });
-
-    dx += A[0];
-    dy += A[1];
-
-    ship.transform.pos = [x, y];
-    ship.transform.dPos = [dx, dy];
     this.forceUpdate();
 
     setTimeout(this._updateTransform, 50);
   },
 
-  // TODO: Move physics out
+  // TODO: Move 'physics' out
   _updateTrails(x, y) {
     const { trailBuffer } = this.props;
     let { ship } = this.state;
@@ -113,7 +85,7 @@ NavDash = React.createClass({
 
   render() {
     const { planets } = this.props;
-    const { ship, theta, trails, mapSize } = this.state;
+    const { ship, theta, mapSize } = this.state;
 
     const [x, y] = ship.transform.pos;
     const [dx, dy] = ship.transform.dPos;
@@ -124,7 +96,6 @@ NavDash = React.createClass({
           ship={ship}
           planets={planets}
           mapSize={mapSize}
-          trails={trails}
         />
 
         <div className="coordinates">
