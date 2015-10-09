@@ -21,6 +21,11 @@ const TransformSchema = SimpleSchema({
     label: "angular velocity",
     defaultValue: [0],
   },
+
+  mass: {
+    type: Number,
+    defaultValue: 1,
+  },
 });
 
 CollectionHelpers = {

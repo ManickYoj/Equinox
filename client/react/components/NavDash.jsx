@@ -44,40 +44,15 @@ NavDash = React.createClass({
     };
   },
 
-  // TODO: Move physics out
   componentDidMount() {
-    setInterval(this._updateTransform, 50);
-  },
-
-  // TODO: Move physics out
-  _updateTransform() {
     const { planets } = this.props;
     const { ship } = this.state;
 
-    Physics.applyGravity(ship.transform, planets[0].transform);
-    Physics.updatePosition(ship.transform);
-    Physics.updatePosition(planets[0].transform);
-    Physics.updateTrail(ship.trail, ship.transform.pos);
-//    this._updateTrails(...ship.transform.pos)
-
-    this.forceUpdate();
-  },
-
-  // TODO: Move 'physics' out
-  _updateTrails(x, y) {
-    const { trailBuffer } = this.props;
-    let { points, offset } = this.state.ship.trail;
-
-    points.push([x, y]);
-    if (points.length >= trailBuffer) {
-      points.shift();
-
-      // Increment the offset if the buffer length would be exceeded
-      this.state.ship.trail.offset ++;
-
-      // And wrap the buffer offset when it hits the buffer length
-      if (this.state.ship.trail.offset === points.length) offset = 0;
-    }
+    // Run Physics update
+    setInterval(() => {
+      Physics.fullUpdate(planets, [ship]);
+      this.forceUpdate();
+    }, 50);
   },
 
   render() {

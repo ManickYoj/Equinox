@@ -36,8 +36,32 @@ const SETTINGS = {
 
 
 Physics = {
-  fullUpdate (iterations=1) {
+  fullUpdate (bodies, ships, iterations=1) {
 
+    // -- Apply Forces & Update Velocities
+    bodies.forEach((body1, ind1) => {
+
+      // Apply gravity between all bodies, excluding a body acting upon itself
+      bodies.forEach((body2, ind2) => {
+        if (ind1 !== ind2) this.applyGravity(body1.transform, body2.transform);
+      });
+
+      // Apply gravity between ships and bodies.
+      // TODO: Consider applying gravity between ships
+      ships.forEach((ship) => {
+        this.applyGravity(body1.transform, ship.transform);
+      });
+    });
+
+    // -- Update Positions & Trails
+    bodies.forEach(body => {
+      this.updatePosition(body.transform);
+    });
+
+    ships.forEach(ship => {
+      this.updatePosition(ship.transform);
+      this.updateTrail(ship.trail, ship.transform.pos);
+    });
   },
 
   vectorFromTo(p1, p2) {

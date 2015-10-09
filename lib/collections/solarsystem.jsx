@@ -5,10 +5,6 @@ const MassiveBody = new SimpleSchema({
     type: CollectionHelpers.transformSchema,
   },
 
-  mass: {
-    type: Number,
-  },
-
   radius: {
     type: Number,
   },
