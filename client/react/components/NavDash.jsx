@@ -29,13 +29,13 @@ NavDash = React.createClass({
         // All information about ship's location, direction, etc.
         transform: {
           pos: [6371000 + 418000, 0],    // Position
-          dPos: [0, 8667],               // Velocity
+          dPos: [0, 9667],               // Velocity
           ang: [0],                        // Angular displacement
           dAng: [0],                       // Angular speed
           mass: 370131,
         },
 
-        trails: {
+        trail: {
           offset: 0,    // Offset for reading the array, useful, but weird
           points: [],
         }
@@ -46,7 +46,7 @@ NavDash = React.createClass({
 
   // TODO: Move physics out
   componentDidMount() {
-    this._updateTransform();
+    setInterval(this._updateTransform, 50);
   },
 
   // TODO: Move physics out
@@ -57,29 +57,26 @@ NavDash = React.createClass({
     Physics.applyGravity(ship.transform, planets[0].transform);
     Physics.updatePosition(ship.transform);
     Physics.updatePosition(planets[0].transform);
-
-    this._updateTrails(...ship.transform.pos);
+    Physics.updateTrail(ship.trail, ship.transform.pos);
+//    this._updateTrails(...ship.transform.pos)
 
     this.forceUpdate();
-
-    setTimeout(this._updateTransform, 50);
   },
 
   // TODO: Move 'physics' out
   _updateTrails(x, y) {
     const { trailBuffer } = this.props;
-    let { ship } = this.state;
+    let { points, offset } = this.state.ship.trail;
 
-    ship.trails.points.push([x, y]);
-    if (ship.trails.points.length >= trailBuffer) {
-      ship.trails.points.shift();
+    points.push([x, y]);
+    if (points.length >= trailBuffer) {
+      points.shift();
 
       // Increment the offset if the buffer length would be exceeded
-      ship.trails.offset ++;
+      this.state.ship.trail.offset ++;
 
       // And wrap the buffer offset when it hits the buffer length
-      if (ship.trails.offset === ship.trails.points.length)
-        ship.trails.offset = 0;
+      if (this.state.ship.trail.offset === points.length) offset = 0;
     }
   },
 
@@ -103,6 +100,8 @@ NavDash = React.createClass({
           <CoordDisplay label={"y"} unit={"m"} value={y} />
           <CoordDisplay label={"dx"} unit={"m/s"} value={dx} />
           <CoordDisplay label={"dy"} unit={"m/s"} value={dy} />
+          <CoordDisplay label={"speed"} unit={"m/s"}
+            value={Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2))} />
         </div>
       </div>
     );

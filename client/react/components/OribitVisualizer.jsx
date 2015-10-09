@@ -7,7 +7,7 @@ OrbitVisualizer = React.createClass({
     size: PropTypes.number,
 
     // Setting variables
-    showTrails: PropTypes.bool,
+    showTrail: PropTypes.bool,
     followShip: PropTypes.bool,
     scrollSensitivity: PropTypes.number,
     trailLength: PropTypes.number,
@@ -17,11 +17,11 @@ OrbitVisualizer = React.createClass({
   getDefaultProps() {
     return {
       size: 800,
-      showTrails: true,
+      showTrail: true,
       followShip: false,
       scrollSensitivity: .002,
-      trailLength: 20,
-      trailSparsity: 5,
+      trailLength: 50,
+      trailSparsity: 8,
     };
   },
 
@@ -31,8 +31,8 @@ OrbitVisualizer = React.createClass({
 
     return {
       mapSize,
-      mapCenter: [0, 0],
-      scale: (size/2) / mapSize,
+      mapCenter: [-1 * Math.pow(10, 7), 0],
+      scale: (size / 2) / mapSize,
     };
   },
 
@@ -58,7 +58,7 @@ OrbitVisualizer = React.createClass({
   render () {
     const {
       ship, size, planets,
-      trailSparsity, trailLength, showTrails
+      trailSparsity, trailLength, showTrail
     } = this.props;
     const { scale, mapCenter, mapSize } = this.state;
 
@@ -110,27 +110,27 @@ OrbitVisualizer = React.createClass({
     }
 
     let trailX, trailY, trailStyle;
-    const trailOffset = ship.trails.offset;
-    const trailElements = ship.trails.points.filter(
+    const { offset } = ship.trail;
+    const trailElements = ship.trail.points.filter(
       (trailCoord, index, arr) => {
         return (
-          showTrails &&
-          (index + trailOffset) % trailSparsity === 0 &&
+          showTrail &&
+          (index + offset) % trailSparsity === 0 &&
           index > arr.length - trailLength * trailSparsity
         )
       }
     ).map((trailCoord, index, arr) => {
       [trailX, trailY] = trailCoord;
 
-        trailStyle = {
-          position: "absolute",
-          top: size/2 + (trailY - my)* scale + "px",
-          left: size/2 + (trailX - mx) * scale + "px",
-          transform: "translate(-50%, -50%)",
-          opacity: 1 - (arr.length - index) / trailLength,
-        }
+      trailStyle = {
+        position: "absolute",
+        top: size/2 + (trailY - my) * scale + "px",
+        left: size/2 + (trailX - mx) * scale + "px",
+        transform: "translate(-50%, -50%)",
+        opacity: 1 - (arr.length - index) / trailLength,
+      }
 
-        return <div key={"trail" + index} style={trailStyle}>+</div>;
+      return <div key={"trail" + index} style={trailStyle}>+</div>;
     });
 
     return (

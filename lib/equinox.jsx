@@ -22,7 +22,7 @@ const ship = {
     mass: 370131
   },
 
-  trails: {
+  trail: {
     offset: 0,    // Offset for reading the array, useful, but weird
     points: [],
   }
@@ -82,5 +82,18 @@ Physics = {
 
   updatePosition(t, stepSize=SETTINGS.stepSize) {
     t.dPos.forEach((elt, ind) => t.pos[ind] += elt * stepSize);
+  },
+
+  updateTrail(trail, newPoint, trailBuffer=SETTINGS.trailBuffer) {
+    trail.points.push(EJSON.clone(newPoint));
+    if (trail.points.length >= trailBuffer) {
+      trail.points.shift();
+
+      // Increment the offset if the buffer length would be exceeded
+      trail.offset ++;
+
+      // And wrap the buffer offset when it hits the buffer length
+      if (trail.offset === trail.points.length) trail.offset = 0;
+    }
   },
 };

@@ -70,7 +70,7 @@ Typed = React.createClass({
     const { renderedMessages } = this.state;
     
     const messages = renderedMessages.map((elt, ind) => {
-      return <span key={ind}>{elt}</span>;
+      return <div key={ind}>{elt}</div>;
     });
   
     return (
