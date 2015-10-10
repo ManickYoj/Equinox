@@ -7,13 +7,11 @@
 meteor-platform
 autopublish
 insecure
-react
 meteorhacks:npm
 cosmos:browserify
-
-
 npm-container
 less
 aldeed:simple-schema
 aldeed:collection2
 accounts-password
+react

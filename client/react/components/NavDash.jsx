@@ -1,4 +1,10 @@
+const { PropTypes } = React;
+
 NavDash = React.createClass({
+  propTypes: {
+    ship: PropTypes.object.isRequired,
+  },
+
   getDefaultProps() {
     return {
       planets: [
@@ -13,40 +19,11 @@ NavDash = React.createClass({
           radius: 6371000,
         },
       ],
-
-      trailBuffer: 5000, // How many recent positions to keep in memory
     }
   },
 
-  getInitialState() {
-    const { trailSparsity } = this.props;
-
-    return {
-      // Will move to props
-      ship: {
-        name: "USS Phoenix",
-
-        // All information about ship's location, direction, etc.
-        transform: {
-          pos: [6371000 + 418000, 0],    // Position
-          dPos: [0, 9667],               // Velocity
-          ang: [0],                        // Angular displacement
-          dAng: [0],                       // Angular speed
-          mass: 370131,
-        },
-
-        trail: {
-          offset: 0,    // Offset for reading the array, useful, but weird
-          points: [],
-        }
-      },
-
-    };
-  },
-
   componentDidMount() {
-    const { planets } = this.props;
-    const { ship } = this.state;
+    const { ship, planets } = this.props;
 
     // Run Physics update
     setInterval(() => {
@@ -56,8 +33,7 @@ NavDash = React.createClass({
   },
 
   render() {
-    const { planets } = this.props;
-    const { ship, theta, mapSize } = this.state;
+    const { planets, ship } = this.props;
 
     const [x, y] = ship.transform.pos;
     const [dx, dy] = ship.transform.dPos;
@@ -67,7 +43,6 @@ NavDash = React.createClass({
         <OrbitVisualizer
           ship={ship}
           planets={planets}
-          mapSize={mapSize}
         />
 
         <div className="coordinates">

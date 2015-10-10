@@ -1,4 +1,4 @@
-const TransformSchema = SimpleSchema({
+const TransformSchema = new SimpleSchema({
   pos: {
     type: [Number],
     label: "position",
@@ -25,6 +25,7 @@ const TransformSchema = SimpleSchema({
   mass: {
     type: Number,
     defaultValue: 1,
+    decimal: true,
   },
 });
 

@@ -27,7 +27,7 @@ const ShipSchema = new SimpleSchema({
     type: CollectionHelpers.transformSchema,
   },
 
-  trails: {
+  trail: {
     type: TrailsSchema,
   }
 });

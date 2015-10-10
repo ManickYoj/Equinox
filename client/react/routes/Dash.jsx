@@ -1,22 +1,18 @@
 const { PropTypes } = React;
 
 Dash = React.createClass({
-  propTypes: {
+  mixins: [ReactMeteorData],
 
+  getMeteorData() {
+    const shipsHandle = Meteor.subscribe("ships");
+
+    return {
+      ship: Ships.findOne({}),
+    };
   },
 
   getDefaultProps() {
     return {
-      ship: {
-        name: "USS Equinox",
-        transform: {
-          radius: 1.20,
-          theta: 86.45,
-          phi: 23.08,
-          heading: 50,
-        },
-      },
-
       sector: {
         name: "Korprulu",
       },
@@ -31,41 +27,40 @@ Dash = React.createClass({
   },
 
   getInitialState() {
-    const { officer, ship, sector } = this.props;
-
-    return {
-      activeDisplay: (
-        <Welcome
-          _onClick={() => {this._changeDisplay(officer.type)} }
-          ship={ship}
-          sector={sector}
-          officer={officer}
-        />
-      ),
-    };
+    return { activeDisplayKey: "welcome" };
   },
   
-  _changeDisplay(displayKey) {
-    const { officer, ship, sector } = this.props;
+  _displayMap(displayKey) {
+    const { officer, sector } = this.props;
+    const { ship } = this.data;
 
     const displayMap = {
-      "welcome": (
+      welcome: (
         <Welcome
-          _onClick={() => {this._changeDisplay(officer.type)} }
+          _onClick={() => {
+            this.setState({activeDisplayKey: officer.type})
+          }}
           ship={ship}
           sector={sector}
           officer={officer}
         />
       ),
 
-      "nav": <NavDash ship={ship}/>,
-    }
+      nav: (
+        <NavDash ship={ship} />
+      ),
+    };
 
-    this.setState({activeDisplay: displayMap[displayKey]});
+    return displayMap[displayKey];
   },
   
 	render() {
-    const { activeDisplay } = this.state;
+    const { ship } = this.data;
+    const { activeDisplayKey } = this.state;
+
+    let activeDisplay = ship === undefined ?
+        <Typed messages={["Loading..."]} typeDelay={150} /> :
+        this._displayMap(activeDisplayKey);
     
 		return (
 			<div id="Dash" className="full-page">

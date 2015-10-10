@@ -1,39 +1,50 @@
-const massiveBody = {
-  transform: {
-    pos: [0, 0],      // Position
-    dPos: [0, 0],     // Velocity
-    ang: [0],           // Angular displacement
-    dAng: [0],          // Angular speed
-    mass: 5.972 * Math.pow(10, 24),
-  },
+// TODO: Move this code to a script that only runs in testing
+Meteor.startup( () => {
+  if (Meteor.isServer) {
+    Ships.remove({}, (err) => {
+      if (err) console.log(err)
+      Ships.insert({
+        name: "USS Phoenix",
 
-  radius: 6371000,
-};
+        transform: {
+          pos: [6371000 + 418000, 0],
+          dPos: [0, 8667],
+          ang: [0],
+          dAng: [0],
+          mass: 370131,
+        },
 
-const ship = {
-  name: "USS Phoenix",
+        trail: {
+          offset: 0,
+          points: [],
+        }
+      });
+    });
 
-  // All information about ship's location, direction, etc.
-  transform: {
-    pos: [6371000 + 418000, 0],
-    dPos: [0, 8667],
-    ang: [0],
-    dAng: [0],
-    mass: 370131
-  },
+    MassiveBodies.remove({}, ()=>{
+      MassiveBodies.insert({
+        name: "Earth",
 
-  trail: {
-    offset: 0,    // Offset for reading the array, useful, but weird
-    points: [],
+        transform: {
+          pos: [0, 0],      // Position
+          dPos: [0, 0],     // Velocity
+          ang: [0],           // Angular displacement
+          dAng: [0],          // Angular speed
+          mass: 5.972 * Math.pow(10, 24),
+        },
+
+        radius: 6371000,
+      });
+    });
+
   }
-};
+});
 
 const SETTINGS = {
   G: 6.674 * Math.pow(10, -11),
   stepSize: 60,
   trailBuffer: 5000,
 };
-
 
 Physics = {
   fullUpdate (bodies, ships, iterations=1) {
