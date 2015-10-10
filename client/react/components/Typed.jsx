@@ -8,7 +8,7 @@ Typed = React.createClass({
   },
   
   getDefaultProps() {
-    return { typeDelay: 50 };
+    return { typeDelay: 25 };
   },
 
   getInitialState() {
@@ -24,6 +24,11 @@ Typed = React.createClass({
     this._addChar();
   },
 
+  componentWillUnmount() {
+    // Clean up timeout
+    clearTimeout(this.state.timeoutId);
+  },
+
   _addChar () {
     const { messages } = this.props;
     let { linesRendered, charsRendered } = this.state;
@@ -33,7 +38,7 @@ Typed = React.createClass({
       if (index < linesRendered) return message;
       else if (index === linesRendered) return message.substring(0, charsRendered + 1);
     });
-  
+
     // If full message is not yet rendered
     if (linesRendered < messages.length) {
       // If the full line is not yet rendered increment the char count
@@ -45,15 +50,16 @@ Typed = React.createClass({
         linesRendered++;
       }
 
+      // Run this function again after a delay
+      const timeoutId = setTimeout(this._addChar, this.props.typeDelay);
+
       // Update the state of this component
       this.setState({
         renderedMessages,
         linesRendered,
         charsRendered,
+        timeoutId,
       });
-      
-      // Run this function again after a delay
-      setTimeout(this._addChar, this.props.typeDelay);
     } 
     
     // If the full message has been rendered, call the callback
@@ -64,7 +70,7 @@ Typed = React.createClass({
     const { renderedMessages } = this.state;
     
     const messages = renderedMessages.map((elt, ind) => {
-      return <div key={ind}>{elt}</div>;
+      return <div key={ind} className="spacer">{elt}</div>;
     });
   
     return (
