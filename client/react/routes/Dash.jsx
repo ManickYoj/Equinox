@@ -4,6 +4,7 @@ Dash = React.createClass({
   mixins: [ReactMeteorData],
 
   getMeteorData() {
+    // TODO: Setup publish/subscribe with appropriate permissions
     const shipsHandle = Meteor.subscribe("ships");
 
     return {
@@ -13,6 +14,7 @@ Dash = React.createClass({
 
   getDefaultProps() {
     return {
+      // TODO: Move these to database
       sector: {
         name: "Korprulu",
       },
