@@ -36,6 +36,10 @@ OrbitVisualizer = React.createClass({
     };
   },
 
+  componentWillMount() {
+    window.addEventListener('keydown', this._handleKeyDown);
+  },
+
   componentWillReceiveProps(nextProps) {
     const { followShip } = this.props;
 
@@ -53,6 +57,27 @@ OrbitVisualizer = React.createClass({
 
     event.preventDefault();
     this.setState({ mapSize, scale });
+  },
+
+  _handleKeyDown(event) {
+    let { mapSize, mapCenter } = this.state;
+
+    switch (event.keyCode) {
+      case 68: // d
+        mapCenter[0] += mapSize * .1;
+        break;
+      case 65: // a
+        mapCenter[0] -= mapSize * .1;
+        break;
+      case 87: // w
+        mapCenter[1] -= mapSize * .1;
+        break;
+      case 83: // s
+        mapCenter[1] += mapSize * .1;
+        break;
+    }
+
+    this.setState({mapSize});
   },
 
   render () {
@@ -134,7 +159,8 @@ OrbitVisualizer = React.createClass({
     });
 
     return (
-      <div id="OrbitVisualizer" style={style} onWheel={this._handleScroll}>
+      <div id="OrbitVisualizer" style={style}
+        onWheel={this._handleScroll}>
         {planetElements}
 
         <div className="shipBox" style={shipBoxStyle}>
