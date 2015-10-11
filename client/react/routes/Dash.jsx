@@ -5,10 +5,15 @@ Dash = React.createClass({
 
   getMeteorData() {
     // TODO: Setup publish/subscribe with appropriate permissions
-    // Games.subscribe("games");
+    // PhysicsObjects.subscribe();
+    const game = Games.findOne({});
+    let physObjs;
+    if (!_.isUndefined(game))
+      physObjs = PhysicsObjects.find({game: game._id}).fetch();
 
     return {
-      game: Games.findOne({}),
+      game,
+      physObjs,
     };
   },
 
@@ -17,7 +22,7 @@ Dash = React.createClass({
   },
   
   _displayMap(displayKey) {
-    const { game } = this.data;
+    const { physObjs, game } = this.data;
 
     const displayMap = {
       welcome: (
@@ -30,7 +35,7 @@ Dash = React.createClass({
       ),
 
       nav: (
-        <NavDash game={game} />
+        <NavDash physObjs={physObjs} />
       ),
     };
 
@@ -38,10 +43,12 @@ Dash = React.createClass({
   },
   
 	render() {
-    const { game } = this.data;
+    const { physObjs, game } = this.data;
     const { activeDisplayKey } = this.state;
 
-    let activeDisplay = game === undefined ?
+    let activeDisplay =
+      physObjs === undefined ||
+      game === undefined ?
         <Typed messages={["Loading..."]} typeDelay={150} /> :
         this._displayMap(activeDisplayKey);
     

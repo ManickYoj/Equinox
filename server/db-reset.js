@@ -1,7 +1,11 @@
 // TODO: Make this script only run in testing
 
 // -- DATA
-const ships = [
+const game = {
+  name: "Sol",
+}
+
+const physicsObjects = [
   {
     name: "USS Phoenix",
 
@@ -13,26 +17,29 @@ const ships = [
       mass: 370131,
     },
 
-    trail: {
-      offset: 0,
-      points: [],
-    }
-  },
-];
+    type: "ship",
 
-const bodies = [
+    typeDetails: {
+      officers: [],
+    },
+  },
+
   {
     name: "Earth",
 
     transform: {
-      pos: [1.49604618 * Math.pow(10, 11), 0],      // Position
-      dPos: [0, -30000],     // Velocity
-      ang: [0],           // Angular displacement
-      dAng: [0],          // Angular speed
+      pos: [1.49604618 * Math.pow(10, 11), 0],
+      dPos: [0, -30000],
+      ang: [0],
+      dAng: [0],
       mass: 5.972 * Math.pow(10, 24),
     },
 
-    radius: 6371000,
+    type: "body",
+
+    typeDetails: {
+      radius: 6371000,
+    },
   },
 
   {
@@ -46,10 +53,13 @@ const bodies = [
       mass: 1.989 * Math.pow(10, 30),
     },
 
-    radius: 695999437,
-  }
-];
+    type: "body",
 
+    typeDetails: {
+      radius: 695999437,
+    },
+  },
+]
 
 // -- Utility Functions for Reset
 function clearRecords(collection) {
@@ -70,19 +80,6 @@ function insertRecord(collection, record) {
   });
 };
 
-function pushRecord(collection, _id, field, record) {
-  const query = {};
-  query[field] = record;
-
-  return new Promise( (resolve, reject) => {
-    collection.update({_id}, {$push: query}, (err, numUpdates) => {
-      if (err) reject(err);
-      else resolve(numUpdates);
-    })
-  });
-};
-
-
 // -- Database Reset Script
 Meteor.startup( () => {
   if (Meteor.isServer) {
@@ -91,43 +88,22 @@ Meteor.startup( () => {
     // -- Clear all DB records
     Promise.all([
       clearRecords(Games),
-//      clearRecords(Ships),
-//      clearRecords(MassiveBodies),
+      clearRecords(PhysicsObjects),
     ])
 
-    // -- Create a new game, ships, and bodies
+    // -- Create a new game
     .then(() => {
-      return Promise.all([
-        // Create new game
-        insertRecord(Games, {name: "Sol"}),
-//
-//        // Create new ships
-//        Promise.all(
-//          ships.map(
-//            (ship) => insertRecord(Ships, ship)
-//          )
-//        ),
-//
-//        // Create new planets
-//        Promise.all(
-//          massiveBodies.map(
-//            (body) => insertRecord(MassiveBodies, body)
-//          )
-//        ),
-      ]);
+      // Create new game
+      return insertRecord(Games, {name: "Sol"})
     })
 
-    // -- Add new ships and bodies to the game
-    .then((values) => {
-      const [game_id] = values;
-
+    // -- Add physics objects to the game
+    .then((game_id) => {
       return Promise.all(
-        ships.map((ship) =>
-          pushRecord(Games, game_id, "ships", ship)
-        ),
-
-        bodies.map((body) =>
-          pushRecord(Games, game_id, "bodies",  body)
+        physicsObjects.map((physObj) => {
+            physObj.game = game_id
+            insertRecord(PhysicsObjects, physObj)
+          }
         ),
       );
     })

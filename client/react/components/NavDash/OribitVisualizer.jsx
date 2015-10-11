@@ -2,12 +2,12 @@ const { PropTypes } = React;
 
 OrbitVisualizer = React.createClass({
   propTypes: {
-    game: PropTypes.object.isRequired,
+    physObjs: PropTypes.array.isRequired,
     size: PropTypes.number,
 
     // Setting variables
     showTrail: PropTypes.bool,
-    target: PropTypes.object,
+    target: PropTypes.number,
     scrollSensitivity: PropTypes.number,
     trailLength: PropTypes.number,
     trailSparsity: PropTypes.number,
@@ -82,29 +82,28 @@ OrbitVisualizer = React.createClass({
 
   render () {
     const {
-      game, size,
+      physObjs, size,
       trailSparsity, trailLength, showTrail
     } = this.props;
     const { scale, mapCenter, mapSize } = this.state;
-
-    // TODO: Remove hardcoded ship
-    const ship = game.ships[0];
-    const planets = game.bodies;
-
     const [mx, my] = mapCenter;
-    const [x, y] = ship.transform.pos;
 
-    let planetStyle, px, py;
-    const planetElements = planets.map((planet, index) => {
-      [px, py] = planet.transform.pos;
+    const objsByType = PhysicsObjects.splitByType(physObjs);
 
-      planetStyle = {
+    let x, y;
+
+    // -- Map body objects to elements
+    let bodyStyle;
+    const bodyElements = objsByType.body.map((body, index) => {
+      [x, y] = body.transform.pos;
+
+      bodyStyle = {
         // Positioning correctly
         position: "absolute",
-        width: planet.radius * 2 * scale + "px",
-        height: planet.radius * 2 * scale + "px",
-        left: size/2 + (px - mx) * scale + "px",
-        top: size/2 + (py - my) * scale + "px",
+        width: body.typeDetails.radius * 2 * scale + "px",
+        height: body.typeDetails.radius * 2 * scale + "px",
+        left: size/2 + (x - mx) * scale + "px",
+        top: size/2 + (y - my) * scale + "px",
         transform: "translate(-50%, -50%)",
 
         // Styling
@@ -114,12 +113,41 @@ OrbitVisualizer = React.createClass({
 
       return (
         <div
-          key={"planet" + index}
-          className="planet center-content"
-          style={planetStyle}>
-          {planet.name}
+          key={"body" + index}
+          className="body center-content"
+          style={bodyStyle}>
+          {body.name}
         </div>
       )
+    });
+
+
+    let shipBoxStyle, shipStyle;
+    const shipElements = objsByType.ship.map((ship, index) => {
+      [x, y] = ship.transform.pos;
+
+      shipBoxStyle = {
+        position: "absolute",
+        top: size/2 + (y - my) * scale + "px",
+        left: size/2 + (x - mx) * scale + "px",
+        transform: "translate(-50%, -50%)",
+      }
+
+      shipStyle = {
+        transform: "rotate(" + ship.transform.ang + "rad)",
+      }
+
+      return(
+        <div
+          key={"ship" + index}
+          className="shipBox"
+          style={shipBoxStyle}>
+            <div className="ship"
+              style={shipStyle}>
+              ↑
+            </div>
+        </div>
+      );
     });
 
     const style = {
@@ -128,51 +156,38 @@ OrbitVisualizer = React.createClass({
       position: "relative",
     }
 
-    const shipBoxStyle = {
-      position: "absolute",
-      top: size/2 + (y - my) * scale + "px",
-      left: size/2 + (x - mx) * scale + "px",
-      transform: "translate(-50%, -50%)",
-    }
-
-    const shipStyle = {
-      transform: "rotate(" + ship.transform.ang + "rad)",
-    }
-
-    let trailX, trailY, trailStyle;
-    const { offset } = ship.trail;
-    const trailElements = ship.trail.points.filter(
-      (trailCoord, index, arr) => {
-        return (
-          showTrail &&
-          (index + offset) % trailSparsity === 0 &&
-          index > arr.length - trailLength * trailSparsity
-        )
-      }
-    ).map((trailCoord, index, arr) => {
-      [trailX, trailY] = trailCoord;
-
-      trailStyle = {
-        position: "absolute",
-        top: size/2 + (trailY - my) * scale + "px",
-        left: size/2 + (trailX - mx) * scale + "px",
-        transform: "translate(-50%, -50%)",
-        opacity: 1 - (arr.length - index) / trailLength,
-      }
-
-      return <div key={"trail" + index} style={trailStyle}>+</div>;
-    });
+//    let trailX, trailY, trailStyle;
+//    const { offset } = ship.trail;
+//    const trailElements = ship.trail.points.filter(
+//      (trailCoord, index, arr) => {
+//        return (
+//          showTrail &&
+//          (index + offset) % trailSparsity === 0 &&
+//          index > arr.length - trailLength * trailSparsity
+//        )
+//      }
+//    ).map((trailCoord, index, arr) => {
+//      [trailX, trailY] = trailCoord;
+//
+//      trailStyle = {
+//        position: "absolute",
+//        top: size/2 + (trailY - my) * scale + "px",
+//        left: size/2 + (trailX - mx) * scale + "px",
+//        transform: "translate(-50%, -50%)",
+//        opacity: 1 - (arr.length - index) / trailLength,
+//      }
+//
+//      return <div key={"trail" + index} style={trailStyle}>+</div>;
+//    });
 
     return (
       <div id="OrbitVisualizer" style={style}
         onWheel={this._handleScroll}>
-        {planetElements}
+        {bodyElements}
+        {shipElements}
 
-        <div className="shipBox" style={shipBoxStyle}>
-          <div className="ship" style={shipStyle}>↑</div>
-        </div>
 
-        {trailElements}
+        {/*trailElements*/}
       </div>
     );
   }
