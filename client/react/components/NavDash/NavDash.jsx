@@ -27,21 +27,42 @@ NavDash = React.createClass({
     const { physObjs } = this.props;
     const { target } = this.state;
 
+    const hud = {
+      position: "absolute",
+      top: "20px",
+      left: "20px",
+      width: "250px",
+    };
+
+    const hudPanel = {
+      borderLeft: "1px solid white",
+      marginBottom: "40px",
+      marginTop: "5px",
+      paddingLeft: "10px",
+    };
 
     return (
       <div id="NavDash" className="full-page center-content">
         <OrbitVisualizer physObjs={physObjs} target={target} />
 
         {/* TODO: Remove hardcoded ship */}
-        <CoordDisplayGroup
-          target={physObjs[target].transform}
-          className="coordinates"
-        />
+        <div style={hud}>
 
-        <TargetSelector
-          physObjs={physObjs}
-          onNewTarget={this._newTarget}
-        />
+          Target Coordinates:
+          <div style={hudPanel}>
+            <CoordDisplayGroup
+                target={physObjs[target].transform}
+              />
+          </div>
+
+          Detected Objects:
+          <div style={hudPanel}>
+            <TargetSelector
+              physObjs={physObjs}
+              onNewTarget={this._newTarget}
+            />
+          </div>
+        </div>
       </div>
     );
   }

@@ -11,7 +11,7 @@ CoordDisplayGroup = React.createClass({
     const [dx, dy] = target.dPos;
 
     return (
-      <div className="coordinates">
+      <div>
           <CoordDisplay label={"x"} unit={"m"} value={x} />
           <CoordDisplay label={"y"} unit={"m"} value={y} />
           <CoordDisplay label={"dx"} unit={"m/s"} value={dx} />
