@@ -2,8 +2,7 @@ const { PropTypes } = React;
 
 OrbitVisualizer = React.createClass({
   propTypes: {
-    ship: PropTypes.object.isRequired,
-    planets: PropTypes.array.isRequired,
+    game: PropTypes.object.isRequired,
     size: PropTypes.number,
 
     // Setting variables
@@ -44,7 +43,8 @@ OrbitVisualizer = React.createClass({
     const { followShip } = this.props;
 
     if (followShip) this.setState({
-      mapCenter: nextProps.ship.transform.pos
+      // TODO: Remove hardcoded ship
+      mapCenter: nextProps.game.ships[0].transform.pos
     });
   },
 
@@ -82,10 +82,14 @@ OrbitVisualizer = React.createClass({
 
   render () {
     const {
-      ship, size, planets,
+      game, size,
       trailSparsity, trailLength, showTrail
     } = this.props;
     const { scale, mapCenter, mapSize } = this.state;
+
+    // TODO: Remove hardcoded ship
+    const ship = game.ships[0];
+    const planets = game.bodies;
 
     const [mx, my] = mapCenter;
     const [x, y] = ship.transform.pos;

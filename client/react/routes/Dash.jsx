@@ -5,27 +5,11 @@ Dash = React.createClass({
 
   getMeteorData() {
     // TODO: Setup publish/subscribe with appropriate permissions
-    const shipsHandle = Meteor.subscribe("ships");
+    // Games.subscribe("games");
 
     return {
-      ship: Ships.findOne({}),
+      game: Games.findOne({}),
     };
-  },
-
-  getDefaultProps() {
-    return {
-      // TODO: Move these to database
-      sector: {
-        name: "Korprulu",
-      },
-
-      officer: {
-        type: "nav",
-        displayName: "Navigation",
-        appellation: "Officer",
-        entry: 0,
-      }
-    }
   },
 
   getInitialState() {
@@ -33,23 +17,20 @@ Dash = React.createClass({
   },
   
   _displayMap(displayKey) {
-    const { officer, sector } = this.props;
-    const { ship } = this.data;
+    const { game } = this.data;
 
     const displayMap = {
       welcome: (
         <Welcome
           _onClick={() => {
-            this.setState({activeDisplayKey: officer.type})
+            this.setState({activeDisplayKey: "nav"})
           }}
-          ship={ship}
-          sector={sector}
-          officer={officer}
+          game={game}
         />
       ),
 
       nav: (
-        <NavDash ship={ship} />
+        <NavDash game={game} />
       ),
     };
 
@@ -57,10 +38,10 @@ Dash = React.createClass({
   },
   
 	render() {
-    const { ship } = this.data;
+    const { game } = this.data;
     const { activeDisplayKey } = this.state;
 
-    let activeDisplay = ship === undefined ?
+    let activeDisplay = game === undefined ?
         <Typed messages={["Loading..."]} typeDelay={150} /> :
         this._displayMap(activeDisplayKey);
     

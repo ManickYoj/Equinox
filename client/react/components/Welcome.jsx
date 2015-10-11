@@ -3,9 +3,7 @@ const { PropTypes } = React;
 Welcome = React.createClass ({
   propTypes: {
     _onClick: PropTypes.func.isRequired,
-    ship: PropTypes.object.isRequired,
-    officer: PropTypes.object.isRequired,
-    sector: PropTypes.object.isRequired,
+    game: PropTypes.object.isRequired,
     clickPrompt: PropTypes.string,
   },
   
@@ -20,7 +18,7 @@ Welcome = React.createClass ({
   },
   
   render() {
-    const { officer, sector, ship, clickPrompt, _onClick } = this.props;
+    const { game, clickPrompt, _onClick } = this.props;
     const { showContinue } = this.state;
     
     let continueButton;
@@ -33,15 +31,11 @@ Welcome = React.createClass ({
         <Typed
           _onCompletion={ () => {this.setState({showContinue: true}); } }
           messages={[
-            `${ship.name} Log`,
-            `${officer.displayName} ${officer.appellation}
-             Entry ${officer.entry.padZeros()}`,
+            `USS HARDCODED Log`,
+            `Navigation Officer
+             Entry 0000`,
             `  `,
-            `- Sector: ${sector.name}`,
-            `- Ship Orbital Characteristics:`,
-            `| Radius: ${ship.transform.radius} light-seconds`,
-            `| Theta: ${ship.transform.theta} degrees`,
-            `| Phi: ${ship.transform.phi} degrees`
+            `System: ${game.name}`,
           ]}
         />
 

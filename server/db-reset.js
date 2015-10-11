@@ -20,7 +20,7 @@ const ships = [
   },
 ];
 
-const massiveBodies = [
+const bodies = [
   {
     name: "Earth",
 
@@ -77,8 +77,8 @@ Meteor.startup( () => {
     // -- Clear all DB records
     Promise.all([
       clearRecords(Games),
-      clearRecords(Ships),
-      clearRecords(MassiveBodies),
+//      clearRecords(Ships),
+//      clearRecords(MassiveBodies),
     ])
 
     // -- Create a new game, ships, and bodies
@@ -86,34 +86,34 @@ Meteor.startup( () => {
       return Promise.all([
         // Create new game
         insertRecord(Games, {name: "Sol"}),
-
-        // Create new ships
-        Promise.all(
-          ships.map(
-            (ship) => insertRecord(Ships, ship)
-          )
-        ),
-
-        // Create new planets
-        Promise.all(
-          massiveBodies.map(
-            (body) => insertRecord(MassiveBodies, body)
-          )
-        ),
+//
+//        // Create new ships
+//        Promise.all(
+//          ships.map(
+//            (ship) => insertRecord(Ships, ship)
+//          )
+//        ),
+//
+//        // Create new planets
+//        Promise.all(
+//          massiveBodies.map(
+//            (body) => insertRecord(MassiveBodies, body)
+//          )
+//        ),
       ]);
     })
 
     // -- Add new ships and bodies to the game
     .then((values) => {
-      const [game_id, ship_ids, body_ids] = values;
+      const [game_id] = values;
 
       return Promise.all(
-        ship_ids.map((ship_id) =>
-          pushRecord(Games, game_id, "ships", ship_id)
+        ships.map((ship) =>
+          pushRecord(Games, game_id, "ships", ship)
         ),
 
-        body_ids.map((body_id) =>
-          pushRecord(Games, game_id, "bodies",  body_id)
+        bodies.map((body) =>
+          pushRecord(Games, game_id, "bodies",  body)
         ),
       );
     })
