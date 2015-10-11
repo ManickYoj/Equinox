@@ -17,15 +17,16 @@ NavDash = React.createClass({
 
   render() {
     const { game } = this.props;
+    const target = game.bodies[0].transform;
 
     return (
       <div id="NavDash" className="full-page center-content">
-        <OrbitVisualizer game={game}/>
+        <OrbitVisualizer game={game} target={target} />
 
         {/* TODO: Remove hardcoded ship */}
         <CoordDisplayGroup
+          target={target}
           className="coordinates"
-          targetTransform={game.ships[0].transform}
         />
       </div>
     );

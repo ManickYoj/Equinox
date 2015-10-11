@@ -2,13 +2,13 @@ const { PropTypes } = React;
 
 CoordDisplayGroup = React.createClass({
   propTypes: {
-    targetTransform: PropTypes.object.isRequired,
+    target: PropTypes.object.isRequired,
   },
 
   render () {
-    const { targetTransform } = this.props;
-    const [x, y] = targetTransform.pos;
-    const [dx, dy] = targetTransform.dPos;
+    const { target } = this.props;
+    const [x, y] = target.pos;
+    const [dx, dy] = target.dPos;
 
     return (
       <div className="coordinates">

@@ -7,7 +7,7 @@ OrbitVisualizer = React.createClass({
 
     // Setting variables
     showTrail: PropTypes.bool,
-    followShip: PropTypes.bool,
+    target: PropTypes.object,
     scrollSensitivity: PropTypes.number,
     trailLength: PropTypes.number,
     trailSparsity: PropTypes.number,
@@ -17,18 +17,19 @@ OrbitVisualizer = React.createClass({
     return {
       size: 800,
       showTrail: true,
-      followShip: false,
-      scrollSensitivity: .002,
+      target: null,
+      scrollSensitivity: .005,
       trailLength: 50,
       trailSparsity: 8,
     };
   },
 
   getInitialState() {
-    const { size, trailSparsity } = this.props;
-    const mapSize = 10000000;
+    const { size, trailSparsity, target } = this.props;
+    const mapSize = 1000000000;
 
     return {
+      target,
       mapSize,
       mapCenter: [-1 * Math.pow(10, 7), 0],
       scale: (size / 2) / mapSize,
@@ -40,11 +41,10 @@ OrbitVisualizer = React.createClass({
   },
 
   componentWillReceiveProps(nextProps) {
-    const { followShip } = this.props;
+    const { target } = this.state;
 
-    if (followShip) this.setState({
-      // TODO: Remove hardcoded ship
-      mapCenter: nextProps.game.ships[0].transform.pos
+    if (target) this.setState({
+      mapCenter: nextProps.target.pos
     });
   },
 
@@ -77,7 +77,7 @@ OrbitVisualizer = React.createClass({
         break;
     }
 
-    this.setState({mapSize});
+    this.setState({mapSize, target: null});
   },
 
   render () {
@@ -115,8 +115,9 @@ OrbitVisualizer = React.createClass({
       return (
         <div
           key={"planet" + index}
-          className="planet"
+          className="planet center-content"
           style={planetStyle}>
+          {planet.name}
         </div>
       )
     });

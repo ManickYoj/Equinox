@@ -6,8 +6,8 @@ const ships = [
     name: "USS Phoenix",
 
     transform: {
-      pos: [6371000 + 418000, 0],
-      dPos: [0, 8667],
+      pos: [1.49604618 * Math.pow(10, 11) + 6371000 + 418000, 0],
+      dPos: [0,  -38667],
       ang: [0],
       dAng: [0],
       mass: 370131,
@@ -25,8 +25,8 @@ const bodies = [
     name: "Earth",
 
     transform: {
-      pos: [0, 0],      // Position
-      dPos: [0, 0],     // Velocity
+      pos: [1.49604618 * Math.pow(10, 11), 0],      // Position
+      dPos: [0, -30000],     // Velocity
       ang: [0],           // Angular displacement
       dAng: [0],          // Angular speed
       mass: 5.972 * Math.pow(10, 24),
@@ -34,6 +34,20 @@ const bodies = [
 
     radius: 6371000,
   },
+
+  {
+    name: "Sun",
+
+    transform: {
+      pos: [0, 0],
+      dPos: [0, 0],
+      ang: [0],
+      dAng: [0],
+      mass: 1.989 * Math.pow(10, 30),
+    },
+
+    radius: 695999437,
+  }
 ];
 
 
