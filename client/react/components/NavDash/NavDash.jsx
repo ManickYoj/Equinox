@@ -47,7 +47,6 @@ NavDash = React.createClass({
       <div id="NavDash" className="full-page center-content">
         <OrbitVisualizer physics={physics} target={target ? target.transform : null} />
 
-        {/* TODO: Remove hardcoded ship */}
         <div style={hud}>
 
           Target Coordinates:
@@ -57,7 +56,7 @@ NavDash = React.createClass({
               />
           </div>
 
-          Detected Objects:
+          Set Reference Frame:
           <div style={hudPanel}>
             <TargetSelector
               physics={physics}

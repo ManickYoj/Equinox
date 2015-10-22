@@ -11,6 +11,7 @@ OrbitVisualizer = React.createClass({
     scrollSensitivity: PropTypes.number,
     trailLength: PropTypes.number,
     trailSparsity: PropTypes.number,
+    lockCamToReference: PropTypes.bool,
   },
 
   getDefaultProps() {
@@ -21,6 +22,7 @@ OrbitVisualizer = React.createClass({
       scrollSensitivity: .005,
       trailLength: 50,
       trailSparsity: 8,
+      lockCamToReference: true,
     };
   },
 
@@ -30,9 +32,23 @@ OrbitVisualizer = React.createClass({
 
     return {
       mapSize,
-      mapCenter: [-1 * Math.pow(10, 7), 0],
+      camPos: [0, 0],
+      pan: [0, 0],
       scale: (size / 2) / mapSize,
     };
+  },
+
+  componentWillReceiveProps(nextProps) {
+    const { lockCamToReference, target } = this.props;
+
+    // FIXME: This code will likely trigger every change,
+    // not just a target change as intended. Need to fix when
+    // user preferences are implemented
+    if (
+      nextProps.target &&
+      !_.isEqual(nextProps.target, target) &&
+      lockCamToReference === true
+    ) this.setState({pan: [0, 0], camPos: nextProps.target.pos});
   },
 
   componentWillMount() {
@@ -51,38 +67,59 @@ OrbitVisualizer = React.createClass({
   },
 
   _handleKeyDown(event) {
-    let { mapSize, mapCenter } = this.state;
+    let { mapSize, pan } = this.state;
 
     switch (event.keyCode) {
       case 68: // d
-        mapCenter[0] += mapSize * .1;
+        pan[0] += mapSize * .1;
         break;
       case 65: // a
-        mapCenter[0] -= mapSize * .1;
+        pan[0] -= mapSize * .1;
         break;
       case 87: // w
-        mapCenter[1] -= mapSize * .1;
+        pan[1] -= mapSize * .1;
         break;
       case 83: // s
-        mapCenter[1] += mapSize * .1;
+        pan[1] += mapSize * .1;
         break;
     }
 
-    this.setState({mapSize, target: null});
+    this.forceUpdate();
   },
 
   render () {
     const {
-      physics, size, target,
+      physics, size, lockCamToReference,
       trailSparsity, trailLength, showTrail
     } = this.props;
-    const { scale, mapCenter, mapSize } = this.state;
-    const [mx, my] = target ? target.pos : mapCenter;
+    const { scale, camPos, pan, mapSize } = this.state;
 
+    // Sum camera position and pan for an ajustment factor on the visualization
+    const ax = camPos[0] + pan[0];
+    const ay = camPos[1] + pan[1];
 
     let x, y;
 
     // -- Map body objects to elements
+    // TODO: Move individual displays to ShipIcon and BodyIcon components,
+    // then run the code for all bodies together
+//    let objStyle;
+//    const physElements = physics.getAll().map((obj, index) => {
+//      [x, y] = obj.transform.pos;
+//
+//      objStyle = {
+//        position: "absolute",
+//        left: size/2 + (x - ax) * scale + "px",
+//        top: size/2 + (y - ay) * scale + "px",
+//        transform: "translate(-50%, -50%)",
+//      }
+//
+//      if (obj.type === "body") {
+//
+//      }
+//
+//    });
+
     let bodyStyle;
     const bodyElements = physics.getByType("body").map((body, index) => {
       [x, y] = body.transform.pos;
@@ -92,8 +129,8 @@ OrbitVisualizer = React.createClass({
         position: "absolute",
         width: body.typeDetails.radius * 2 * scale + "px",
         height: body.typeDetails.radius * 2 * scale + "px",
-        left: size/2 + (x - mx) * scale + "px",
-        top: size/2 + (y - my) * scale + "px",
+        left: size/2 + (x - ax) * scale + "px",
+        top: size/2 + (y - ay) * scale + "px",
         transform: "translate(-50%, -50%)",
 
         // Styling
@@ -118,8 +155,8 @@ OrbitVisualizer = React.createClass({
 
       shipBoxStyle = {
         position: "absolute",
-        top: size/2 + (y - my) * scale + "px",
-        left: size/2 + (x - mx) * scale + "px",
+        left: size/2 + (x - ax) * scale + "px",
+        top: size/2 + (y - ay) * scale + "px",
         transform: "translate(-50%, -50%)",
       }
 
