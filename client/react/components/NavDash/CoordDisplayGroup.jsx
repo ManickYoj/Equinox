@@ -2,11 +2,18 @@ const { PropTypes } = React;
 
 CoordDisplayGroup = React.createClass({
   propTypes: {
-    target: PropTypes.object.isRequired,
+    target: PropTypes.object,
+  },
+
+  getDefaultProps() {
+    return {target: null};
   },
 
   render () {
     const { target } = this.props;
+
+    if (target === null) return <div>No Target</div>;
+
     const [x, y] = target.pos;
     const [dx, dy] = target.dPos;
 

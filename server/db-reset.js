@@ -10,8 +10,8 @@ const physicsObjects = [
     name: "USS Phoenix",
 
     transform: {
-      pos: [1.49604618 * Math.pow(10, 11) + 6371000 + 418000, 0],
-      dPos: [0,  -38667],
+      pos: [1.49604618 * Math.pow(10, 11) - 6371000 - 418000, 0],
+      dPos: [0,  -30000 + 11667], // Physics may be broken
       ang: [0],
       dAng: [0],
       mass: 370131,
@@ -98,10 +98,10 @@ Meteor.startup( () => {
     })
 
     // -- Add physics objects to the game
-    .then((game_id) => {
+    .then((gameId) => {
       return Promise.all(
         physicsObjects.map((physObj) => {
-            physObj.game = game_id
+            physObj.gameId = gameId
             insertRecord(PhysicsObjects, physObj)
           }
         ),

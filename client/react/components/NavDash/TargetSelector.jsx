@@ -2,8 +2,8 @@ const { PropTypes } = React;
 
 TargetSelector = React.createClass({
   propTypes: {
-    physObjs: PropTypes.array.isRequired,
-    currentTarget: PropTypes.number,
+    physics: PropTypes.object.isRequired,
+    currentTarget: PropTypes.string,
     onTargetSelected: PropTypes.func,
   },
 
@@ -15,8 +15,7 @@ TargetSelector = React.createClass({
   },
 
   render () {
-    const { physObjs, currentTarget, onTargetSelected } = this.props;
-    const objsByType = PhysicsObjects.splitByType(physObjs);
+    const { physics, currentTarget, onTargetSelected } = this.props;
 
     const groupStyle = {
       marginBottom: "10px",
@@ -24,14 +23,19 @@ TargetSelector = React.createClass({
 
     const itemStyle = {
       marginLeft: "10px",
+      display: "block",
     }
 
-    const targetLists = _.map(objsByType, (objs, type) => {
+    const targetLists = _.map(physics.indexByType(), (objs, type) => {
       const items = objs.map((item, index) => {
+
+        let renderedName = item.name;
+        if (item._id === currentTarget) renderedName = "[" + item.name + "]";
         return (
-          <div key={item.type + index} style={itemStyle}>
-              {item.name}
-          </div>
+          <button key={item.type + index} style={itemStyle}
+            onClick={() => {onTargetSelected(item._id)}}>
+              {renderedName}
+          </button>
         );
       });
 

@@ -2,12 +2,12 @@ const { PropTypes } = React;
 
 OrbitVisualizer = React.createClass({
   propTypes: {
-    physObjs: PropTypes.array.isRequired,
+    physics: PropTypes.object.isRequired,
     size: PropTypes.number,
 
     // Setting variables
     showTrail: PropTypes.bool,
-    target: PropTypes.number,
+    target: PropTypes.object,
     scrollSensitivity: PropTypes.number,
     trailLength: PropTypes.number,
     trailSparsity: PropTypes.number,
@@ -29,7 +29,6 @@ OrbitVisualizer = React.createClass({
     const mapSize = 1000000000;
 
     return {
-      target,
       mapSize,
       mapCenter: [-1 * Math.pow(10, 7), 0],
       scale: (size / 2) / mapSize,
@@ -38,14 +37,6 @@ OrbitVisualizer = React.createClass({
 
   componentWillMount() {
     window.addEventListener('keydown', this._handleKeyDown);
-  },
-
-  componentWillReceiveProps(nextProps) {
-    const { target } = this.state;
-
-    if (target) this.setState({
-      mapCenter: nextProps.target.pos
-    });
   },
 
   _handleScroll(event) {
@@ -82,19 +73,18 @@ OrbitVisualizer = React.createClass({
 
   render () {
     const {
-      physObjs, size,
+      physics, size, target,
       trailSparsity, trailLength, showTrail
     } = this.props;
     const { scale, mapCenter, mapSize } = this.state;
-    const [mx, my] = mapCenter;
+    const [mx, my] = target ? target.pos : mapCenter;
 
-    const objsByType = PhysicsObjects.splitByType(physObjs);
 
     let x, y;
 
     // -- Map body objects to elements
     let bodyStyle;
-    const bodyElements = objsByType.body.map((body, index) => {
+    const bodyElements = physics.getByType("body").map((body, index) => {
       [x, y] = body.transform.pos;
 
       bodyStyle = {
@@ -123,7 +113,7 @@ OrbitVisualizer = React.createClass({
 
 
     let shipBoxStyle, shipStyle;
-    const shipElements = objsByType.ship.map((ship, index) => {
+    const shipElements = physics.getByType("ship").map((ship, index) => {
       [x, y] = ship.transform.pos;
 
       shipBoxStyle = {

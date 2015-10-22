@@ -7,13 +7,14 @@ Dash = React.createClass({
     // TODO: Setup publish/subscribe with appropriate permissions
     // PhysicsObjects.subscribe();
     const game = Games.findOne({});
-    let physObjs;
+
+    let physics;
     if (!_.isUndefined(game))
-      physObjs = PhysicsObjects.find({game: game._id}).fetch();
+      physics = new Physics(game._id)
 
     return {
       game,
-      physObjs,
+      physics,
     };
   },
 
@@ -22,7 +23,7 @@ Dash = React.createClass({
   },
   
   _displayMap(displayKey) {
-    const { physObjs, game } = this.data;
+    const { physics, game } = this.data;
 
     const displayMap = {
       welcome: (
@@ -35,7 +36,7 @@ Dash = React.createClass({
       ),
 
       nav: (
-        <NavDash physObjs={physObjs} />
+        <NavDash physics={physics} />
       ),
     };
 
@@ -43,11 +44,11 @@ Dash = React.createClass({
   },
   
 	render() {
-    const { physObjs, game } = this.data;
+    const { physics, game } = this.data;
     const { activeDisplayKey } = this.state;
 
     let activeDisplay =
-      physObjs === undefined ||
+      physics === undefined ||
       game === undefined ?
         <Typed messages={["Loading..."]} typeDelay={150} /> :
         this._displayMap(activeDisplayKey);
