@@ -3,14 +3,13 @@ const { PropTypes } = React;
 OrbitVisualizer = React.createClass({
   propTypes: {
     physics: PropTypes.object.isRequired,
+    trails: PropTypes.object,
     size: PropTypes.number,
 
     // Setting variables
     showTrail: PropTypes.bool,
     target: PropTypes.object,
     scrollSensitivity: PropTypes.number,
-    trailLength: PropTypes.number,
-    trailSparsity: PropTypes.number,
     lockCamToReference: PropTypes.bool,
   },
 
@@ -90,7 +89,7 @@ OrbitVisualizer = React.createClass({
   render () {
     const {
       physics, size, lockCamToReference,
-      trailSparsity, trailLength, showTrail
+      showTrail, trails
     } = this.props;
     const { scale, camPos, pan, mapSize } = this.state;
 
@@ -183,38 +182,37 @@ OrbitVisualizer = React.createClass({
       position: "relative",
     }
 
-//    let trailX, trailY, trailStyle;
-//    const { offset } = ship.trail;
-//    const trailElements = ship.trail.points.filter(
-//      (trailCoord, index, arr) => {
-//        return (
-//          showTrail &&
-//          (index + offset) % trailSparsity === 0 &&
-//          index > arr.length - trailLength * trailSparsity
-//        )
-//      }
-//    ).map((trailCoord, index, arr) => {
-//      [trailX, trailY] = trailCoord;
-//
-//      trailStyle = {
-//        position: "absolute",
-//        top: size/2 + (trailY - my) * scale + "px",
-//        left: size/2 + (trailX - mx) * scale + "px",
-//        transform: "translate(-50%, -50%)",
-//        opacity: 1 - (arr.length - index) / trailLength,
-//      }
-//
-//      return <div key={"trail" + index} style={trailStyle}>+</div>;
-//    });
+    // Trail Rendering Code
+    let trailElements = [];
+    let tx, ty, trailStyle;
+    _.forEach(trails, (trail, id) => {
+      trail.points.forEach((point, index) => {
+        [tx, ty] = point;
+
+        trailStyle = {
+          position: "absolute",
+          left: size/2 + (tx - ax) * scale + "px",
+          top: size/2 + (ty - ay) * scale + "px",
+          transform: "translate(-50%, -50%)",
+          opacity: 1 - (trail.points.length - index) / trail.maxLength,
+        }
+
+        const elem = (
+          <div key={`trail of ${id} @ (${tx}, ${ty})`} style={trailStyle}>
+            +
+          </div>
+        );
+
+        trailElements.push(elem);
+      });
+    });
 
     return (
       <div id="OrbitVisualizer" style={style}
         onWheel={this._handleScroll}>
         {bodyElements}
         {shipElements}
-
-
-        {/*trailElements*/}
+        {trailElements}
       </div>
     );
   }

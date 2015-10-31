@@ -6,15 +6,27 @@ NavDash = React.createClass({
   },
 
   getInitialState() {
-    return { targetId: null };
+    return {
+      targetId: null,
+      trails: {},
+    };
   },
 
   componentDidMount() {
     const { physics } = this.props;
+    const { trails } = this.state;
+
+    physics.getAll().forEach((obj) => {
+      trails[obj._id] = new Trail();
+    });
 
     // Run Physics update
     setInterval(() => {
       physics.update();
+      physics.getAll().forEach((obj) => {
+        trails[obj._id].update(obj.transform.pos);
+      });
+
       this.forceUpdate();
     }, 50);
   },
@@ -23,9 +35,13 @@ NavDash = React.createClass({
     this.setState({targetId});
   },
 
+  _updateTrails() {
+
+  },
+
   render() {
     const { physics } = this.props;
-    const { targetId } = this.state;
+    const { targetId, trails } = this.state;
 
     const hud = {
       position: "absolute",
@@ -45,7 +61,10 @@ NavDash = React.createClass({
 
     return (
       <div id="NavDash" className="full-page center-content">
-        <OrbitVisualizer physics={physics} target={target ? target.transform : null} />
+        <OrbitVisualizer
+          physics={physics}
+          trails={trails}
+          target={target ? target.transform : null} />
 
         <div style={hud}>
 
