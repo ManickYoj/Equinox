@@ -1,4 +1,6 @@
 Login = React.createClass({
+  mixins: [ReactRouter.Navigation],
+
   getInitialState() {
     return {
       pulsate: true,
@@ -30,10 +32,11 @@ Login = React.createClass({
   },
 
   _login() {
-    Meteor.loginWithPassword(...this._getValues(), (err) => {
-      if (err) console.log(err); // Do a thing
-      // Do another thing
-    });
+    this.transitionTo('/dash')
+//    Meteor.loginWithPassword(...this._getValues(), (err) => {
+//      if (err) console.log(err); // Do a thing
+//      // Do another thing
+//    });
   },
 
   render() {
